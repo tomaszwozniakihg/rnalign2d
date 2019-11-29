@@ -1,4 +1,6 @@
-**RNAlign2D**
+=========
+RNAlign2D
+=========
 RNAlign2D is a Python wrapper allowing one to align multiple RNA molecules using
 information about secondary structure and sequence.
 For this purpose MUSCLE program is used, but one can adjust it
@@ -10,7 +12,9 @@ translation process - that is only technical solution), and use MUSCLE to
 align pseudo-amino acid sequences. Finally process is reverted and alignment
 with original sequence and secondary structure is restored.
 
-**Dot bracket format**
+==================
+Dot bracket format
+==================
 Format, where paired residues as marked as brackets () and unpaired residues
 are marked as dots.
 For example simple structure containing hairpin
@@ -22,7 +26,9 @@ For pseudoknots [] brackets are used. For higher level pseudoknots {}, <>
 or even Aa, Bb, Cc ... pairs are used. For the RNAlign2D maximum pseudoknots
 level taken into account is Bb.
 
-**Input and output files**
+======================
+Input and output files
+======================
 Input and output files are modified FASTA format.
 For each sequence in the file:
 * First line contain > sign and then optional name
@@ -42,7 +48,9 @@ Secondary structure may contain higher level pseudoknots, but for the *simple*
 mode only fist level - [] pseudoknots are treated differently, and for the
 *pseudo* mode only pseudoknots up to level Bb.
 
-**Modes**
+=====
+Modes
+=====
 * Mode *simple*
 * Mode *pseudo*
 Mode *simple* is used in most cases, when there are no pseudoknots or
@@ -55,7 +63,9 @@ results than mode pseudo even for sequences.
 In case of the mode *pseudo* there is a need to explicitly show matrix dedicated
 for *pseudo* alignment, otherwise results may not reflect anything.
 
-**Options**
+=======
+Options
+=======
 * *-i* option - input file
 * *-o* option - output file
 * *-matrix* option - file with custom matrix or default matrix for pseudoknots (data/pseudo_matrix in the project)
@@ -67,7 +77,9 @@ for *pseudo* alignment, otherwise results may not reflect anything.
 example usage:
 ``rnalign2d -i my_input -o my_output``
 
-**Custom matrix**
+=============
+Custom matrix
+=============
 One can define matrix for himself. As it is simply text file, there is nothing
 that cannot be done manually. Hovewer there is script create_matrix, that can
 facilitate that process.
@@ -94,27 +106,35 @@ facilitate that process.
 exaple usage:
 ``create_matrix -o my_result -seq_match_add 8``
 
-**Remove modifications**
+====================
+Remove modifications
+====================
 One can remove modifications from file for this there is script rm_mod
 There are options *-i* to define input file and *-o* to define output file
 
 exaple usage:
 ``create_matrix -o my_result -i my_input``
 
-**REQUIREMENTS**
+============
+REQUIREMENTS
+============
 * Python 3 (tested on Python 3.5)
 * MUSCLE (tested on version 3.8.31)
 * pytest (tested on version 5.1.3)
 * Vienna RNA (optional, tested on version 2.4.14)
 
-**EXAMPLE FILES**
+=============
+EXAMPLE FILES
+=============
 In the directory *example* there are 3 files:
 * dot_bracket.txt - file containing example input sequence
 * dot_bracket2.txt - file containing example output
 * dot_bracket_cls.txt - file containing only sequences
 Files are created using data from T-psi-C-database_tpsic.igcz.poznan.pl
 
-**OTHER**
+=====
+OTHER
+=====
 In case of WARNING:
 ``*** WARNING *** Matrix is not symmetrical, �->�=-10, �->�=0``
 most probably there is no problem at all,
@@ -123,6 +143,8 @@ but if it is your custom matrix, you can check it
 
 To test this software Vienna RNA is required, otherwise one test would fail.
 
-**CITATION**
+========
+CITATION
+========
 If you are using our software in your research - cite us:
 <manuscript in preparation>
