@@ -51,8 +51,10 @@ mode only fist level - [] pseudoknots are treated differently, and for the
 =====
 Modes
 =====
-* Mode *simple*
-* Mode *pseudo*
+
+- Mode *simple*
+- Mode *pseudo*
+
 Mode *simple* is used in most cases, when there are no pseudoknots or
 there are only first level pseudoknots. It uses both sequence and secondary
 structure into account. Higher level pseudoknots are treated as
@@ -66,15 +68,16 @@ for *pseudo* alignment, otherwise results may not reflect anything.
 =======
 Options
 =======
-* *-i* option - input file
-* *-o* option - output file
-* *-matrix* option - file with custom matrix or default matrix for pseudoknots (data/pseudo_matrix in the project)
-* *-mode* option - allow to select one of the modes: *simple* or *pseudo*, default *simple*, please remember to use proper matrix for given mode
-* *-gapopen* option - allow to select gap opening penalty for sequence alignment
-* *-gapextend* option - allow to select gap extending penalty for sequence
-  alignment
+
+- *-i* option - input file
+- *-o* option - output file
+- *-matrix* option - file with custom matrix or default matrix for pseudoknots (data/pseudo_matrix in the project)
+- *-mode* option - allow to select one of the modes: *simple* or *pseudo*, default *simple*, please remember to use proper matrix for given mode
+- *-gapopen* option - allow to select gap opening penalty for sequence alignment
+- *-gapextend* option - allow to select gap extending penalty for sequence alignment
 
 example usage:
+
 ``rnalign2d -i my_input -o my_output``
 
 =============
@@ -104,6 +107,7 @@ facilitate that process.
 * Output name could be defined using *-o* option
 
 exaple usage:
+
 ``create_matrix -o my_result -seq_match_add 8``
 
 ====================
@@ -113,6 +117,7 @@ One can remove modifications from file for this there is script rm_mod
 There are options *-i* to define input file and *-o* to define output file
 
 exaple usage:
+
 ``create_matrix -o my_result -i my_input``
 
 ============
@@ -127,9 +132,11 @@ REQUIREMENTS
 EXAMPLE FILES
 =============
 In the directory *example* there are 3 files:
-* dot_bracket.txt - file containing example input sequence
-* dot_bracket2.txt - file containing example output
-* dot_bracket_cls.txt - file containing only sequences
+
+- dot_bracket.txt - file containing example input sequence
+- dot_bracket2.txt - file containing example output
+- dot_bracket_cls.txt - file containing only sequences
+
 Files are created using data from T-psi-C-database_tpsic.igcz.poznan.pl
 
 =====
@@ -138,8 +145,8 @@ OTHER
 In case of WARNING:
 ``*** WARNING *** Matrix is not symmetrical, �->�=-10, �->�=0``
 most probably there is no problem at all,
-but if it is your custom matrix, you can check it
- to ensure it contain desired data
+but if it is your custom matrix, you can check it to ensure it contain desired
+data
 
 To test this software Vienna RNA is required, otherwise one test would fail.
 
