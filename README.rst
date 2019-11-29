@@ -58,10 +58,8 @@ for *pseudo* alignment, otherwise results may not reflect anything.
 **Options**
 * *-i* option - input file
 * *-o* option - output file
-* *-matrix* option - file with custom matrix or default matrix for pseudoknots
-  (data/pseudo_matrix in the project)
-* *-mode* option - allow to select one of the modes: *simple* or *pseudo*,
-  default *simple*, please remember to use proper matrix for given mode
+* *-matrix* option - file with custom matrix or default matrix for pseudoknots (data/pseudo_matrix in the project)
+* *-mode* option - allow to select one of the modes: *simple* or *pseudo*, default *simple*, please remember to use proper matrix for given mode
 * *-gapopen* option - allow to select gap opening penalty for sequence alignment
 * *-gapextend* option - allow to select gap extending penalty for sequence
   alignment
@@ -104,10 +102,10 @@ exaple usage:
 ``create_matrix -o my_result -i my_input``
 
 **REQUIREMENTS**
-Python 3 (tested on Python 3.5)
-MUSCLE (tested on version 3.8.31)
-pytest (tested on version 5.1.3)
-Vienna RNA (optional, tested on version 2.4.14)
+* Python 3 (tested on Python 3.5)
+* MUSCLE (tested on version 3.8.31)
+* pytest (tested on version 5.1.3)
+* Vienna RNA (optional, tested on version 2.4.14)
 
 **EXAMPLE FILES**
 In the directory *example* there are 3 files:
