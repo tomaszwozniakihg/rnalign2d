@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#PROGRAMS
+muscle3.8.31_i86linux64
+ViennaRNA-2.4.14.tar.gz
+
+# IDEA files
+.idea*
+
+
