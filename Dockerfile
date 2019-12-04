@@ -5,8 +5,8 @@
 # Please adjust version numbers as found suitable
 
 # To run this dockerfile:
-# docker build -t trnalign2d .
-# docker run -it trnalign2d /bin/bash
+# docker build -t rnalign2d .
+# docker run -it rnalign2d /bin/bash
 
 FROM python:3.6.9-stretch
 ENV PYTHONUNBUFFERED 1

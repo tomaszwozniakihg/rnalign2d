@@ -31,9 +31,9 @@ Input and output files
 ======================
 Input and output files are modified FASTA format.
 For each sequence in the file:
-* First line contain > sign and then optional name
-* Second line contain sequence (or multiple lines)
-* Third line contain structure (or multiple lines)
+* First line contain > character and then optional name
+* Second line (or multiple lines) contain sequence
+* Third line (or multiple lines) contain structure
 Sequence and structure are distinguished on the basis of dot and bracket
 content. If there is no secondary structure, linear - unpaired structure
 is assumed.
@@ -43,7 +43,8 @@ generate missing secondary structures.
 Sequence may contain modified nucleotides - these modifications
 of nucleotide residues are removed (for example B - 2′-O-methylcytidine
 is converted to C - cytidine), and after the alignment they are restored back
-to the original state.
+to the original state. RNAlign2D uses modifications abbreviations from
+MODOMICS database.
 Secondary structure may contain higher level pseudoknots, but for the *simple*
 mode only fist level - [] pseudoknots are treated differently, and for the
 *pseudo* mode only pseudoknots up to level Bb.
@@ -86,7 +87,8 @@ Custom matrix
 One can define matrix for himself. As it is simply text file, there is nothing
 that cannot be done manually. Hovewer there is script create_matrix, that can
 facilitate that process.
-* Most probably the strongest score should be given tho the same type of
+
+* Most probably the strongest score should be given to the same type of
   brackets like ( and ( or [ and [, default value is 7, option: *-same*
 * Probably the smallest score should be given to the oposite brackets like
   ( and ), default value is -10, option *-reverse*
@@ -118,7 +120,7 @@ There are options *-i* to define input file and *-o* to define output file
 
 exaple usage:
 
-``create_matrix -o my_result -i my_input``
+``rm_mod -o my_result -i my_input``
 
 ============
 REQUIREMENTS
