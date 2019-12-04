@@ -5,6 +5,10 @@ RNAlign2d is tested with MUSCLE v3.8.31
 2) Run command
 python setup.py install
 
+
 For testing purposes pytest is used
 Please install
 pytest==5.1.3
+
+Please note, that python3-setuptools is also required,
+and may not be already installed.
