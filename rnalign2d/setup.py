@@ -16,7 +16,8 @@ setup(name='RNAlign2D',
           'console_scripts': [
               'rnalign2d = rnalign2d.rnalign2d:main',
               'create_matrix = rnalign2d.create_matrix:main',
-              'rm_mod = rnalign2d.rm_mod:main'
+              'rm_mod = rnalign2d.rm_mod:main',
+              'refinement = rnalign2d.refinement:main'
           ]
       },
 )

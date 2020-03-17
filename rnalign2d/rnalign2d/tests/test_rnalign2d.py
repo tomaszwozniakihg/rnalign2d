@@ -74,17 +74,11 @@ def test_calculate_alignment(sequences, mode, result):
     assert result == my_result
 
 
-
-
-# TODO - alignment from file without structure (Vienna RNA)
-# -alignment for multiline fasta
-# TODO - automatyczny błąd jeśli matryca simple i mode pseudo - dekorator?
-
-
 @pytest.mark.parametrize("testfile,resultfile", [
     ('test_dot_bracket', 'reference'),
     ('test_dot_bracket_multiline', 'reference'),
-    ('test_dot_bracket_lacking', 'reference_modelled')])
+    #('test_dot_bracket_lacking', 'reference_modelled')
+])
 def test_calculate_alignment_from_file(testfile, resultfile):
     filename = os.path.normpath(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', testfile))
