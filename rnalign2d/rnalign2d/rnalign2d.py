@@ -92,7 +92,8 @@ def add_original_modifications(sequence, original_sequence):
     return "".join(new_sequence)
 
 
-def calculate_alignment(sequences, mode, matrix, gapopen, gapextend):
+def calculate_alignment(
+        sequences, mode, matrix, gapopen, gapextend, hash=uuid4().hex):
     """
     1 - remove modifications
     2 - convert sequence
@@ -100,7 +101,6 @@ def calculate_alignment(sequences, mode, matrix, gapopen, gapextend):
     4 - revert sequences
     5 - add original modifications
     """
-    hash = uuid4().hex
     new_file_lines = []
     for i, element in enumerate(sequences):
         name, sequence, structure = element
@@ -154,7 +154,6 @@ def calculate_alignment(sequences, mode, matrix, gapopen, gapextend):
     os.remove(temp_name_in)
     os.remove(temp_name_out)
     return new_sequences
-
 
 
 def calculate_alignment_from_file(
