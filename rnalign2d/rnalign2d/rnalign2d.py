@@ -163,8 +163,9 @@ def calculate_alignment_from_file(
     result = calculate_alignment(sequences, mode, matrix, gapopen, gapextend)
     if refinement:
         dotbracket_structures = [x[2] for x in result]
-        result = refine(
+        dotbracket_structures = refine(
             dotbracket_structures, max_refinement, center, repeat_refinement)
+        result=convert_to_file_data(result, dotbracket_structures)
     with open(out_filename, 'w') as f:
         for element in result:
             f.write("{}\n{}\n{}\n".format(*element))

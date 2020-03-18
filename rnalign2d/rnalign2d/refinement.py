@@ -395,11 +395,18 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
         more_left_group = min(names)
     else:
         more_left_group = max(names)
-    groups = detailed_groups ##########################################################################################################################
-
+    groups = detailed_groups
+    names = list(groups.keys())
+    if 'position' in names:
+        names.remove('position')
 
     sorted_group_keys = sorted(
-        list(groups.keys()), reverse=True if left_or_right=='left' else False)
+        names, reverse=True if left_or_right=='left' else False)
+    # if 'position' - then add it to the first group
+    if 'position' in groups.keys():
+        groups[sorted_group_keys[0]].extend(groups['position'])
+        del groups['position']
+
     # if distance is acceptable - then do it - in case of lack of secondary structure element - distance may be huge
     distances = [
         abs(sorted_group_keys[0] - x)
@@ -560,7 +567,6 @@ def refine(dotbracket_structures, max_nt, center, repeat):
     for i in range(repeat):
         dotbracket_structures = move_1_2nt_gaps(
             dotbracket_structures, offset=0, max_diff=max_nt, multi_score=1.1)
-
         if center:
             representations = [
                 structure_to_representation(structure)
@@ -586,26 +592,6 @@ def refine_from_file(filename, out_filename, max_nt, center, repeat=1):
     with open(out_filename, 'w') as f:
         for element in result:
             f.write("{}\n{}\n{}\n".format(*element))
-
-
-    # # write to file
-    # with open(out_filename, 'w') as f:
-    #     for i in range(len(dotbracket_structures)):
-    #         sequence = file_data[i][1]
-    #         new_sequence = []
-    #         structure = dotbracket_structures[i]
-    #         b = 0
-    #         for a in range(len(structure)):
-    #             if structure[a] == '-':
-    #                 new_sequence.append('-')
-    #             else:
-    #                 while sequence[b] == '-':
-    #                     b += 1
-    #                 new_sequence.append(sequence[b])
-    #                 b += 1
-    #         new_sequence = ''.join(new_sequence)
-    #         f.write("{}\n{}\n{}\n".format(
-    #             file_data[i][0], new_sequence, structure))
 
 
 def main():

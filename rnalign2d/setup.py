@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='RNAlign2D',
-      version='1.0.0',
+      version='1.1.0',
       packages=['rnalign2d',],
       package_data={'': ['data/pseudo_matrix', 'data/simple_matrix']},
       include_package_data=True,
