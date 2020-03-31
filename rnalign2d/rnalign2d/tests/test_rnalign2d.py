@@ -74,12 +74,16 @@ def test_calculate_alignment(sequences, mode, result):
     assert result == my_result
 
 
-@pytest.mark.parametrize("testfile,resultfile", [
-    ('test_dot_bracket', 'reference'),
-    ('test_dot_bracket_multiline', 'reference'),
+@pytest.mark.parametrize(
+    "testfile, refinement, max_refinement, center, repeat_refinement, "
+    "resultfile", [
+    ('test_dot_bracket', False, 2, False, 1, 'reference'),
+    ('test_dot_bracket_multiline', False, 2, False, 1, 'reference'),
     #('test_dot_bracket_lacking', 'reference_modelled')
 ])
-def test_calculate_alignment_from_file(testfile, resultfile):
+def test_calculate_alignment_from_file(
+        testfile, refinement, max_refinement, center, repeat_refinement,
+        resultfile):
     filename = os.path.normpath(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', testfile))
     mode = 'simple'
@@ -89,7 +93,7 @@ def test_calculate_alignment_from_file(testfile, resultfile):
     gapopen = -12
     gapextend = -1
     calculate_alignment_from_file(
-            filename, 'out_filename', mode, matrix, gapopen, gapextend)
+            filename, 'out_filename', mode, matrix, gapopen, gapextend, refinement, max_refinement, center, repeat_refinement)
     result = open('out_filename', 'r').read()
     file = os.path.normpath(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', resultfile))

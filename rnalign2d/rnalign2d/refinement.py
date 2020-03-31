@@ -7,8 +7,6 @@ except SystemError:
     from rnalign2d.common import parse_file, convert_to_file_data
 
 
-#1 sprawdź czy luka jest w pojedynczym trzonie
-
 def structure_to_representation(dotbracket_structure):
     matching_positions = {}
     matching_pairs = {')': '(', '}': '{', ']': '[', '>': '<'}
@@ -67,9 +65,9 @@ def find_structural_blocks(dotbracket_structure, representation):
 
             else:
                 if i + 1 < dotbracket_structure_len:
-                    if dotbracket_structure[i] == dotbracket_structure[i+1] and \
-                                    dotbracket_structure[representation[i]] ==\
-                                    dotbracket_structure[representation[i+1]]:
+                    if dotbracket_structure[i] == dotbracket_structure[i+1] \
+                            and dotbracket_structure[representation[i]] == \
+                            dotbracket_structure[representation[i+1]]:
                         # if end of structure:
                         if dotbracket_structure_len == i + 1:
                             blocks.append((current_block_start, i+1))
@@ -80,7 +78,8 @@ def find_structural_blocks(dotbracket_structure, representation):
                             if dotbracket_structure[i] == \
                                     dotbracket_structure[i+2] and \
                                     dotbracket_structure[representation[i]] \
-                                    == dotbracket_structure[representation[i+2]]:
+                                    == dotbracket_structure[
+                                        representation[i+2]]:
                                 continue
                         # if there is no mismatch
                         blocks.append((current_block_start, i))
@@ -161,26 +160,24 @@ def move_1_2nt_gaps(
                 if '-' in dotbracket_structures[structure_no][
                           block[0]:block[1]]:
                     gap_in = True
-
                 left = 0
-                # if block_no > 0:
-                #     left = single_structure_blocks[block_no-1][1] + 1
 
                 right = len(dotbracket_structures[structure_no]) - 1
                 if block_no < len(single_structure_blocks) - 1:
                     right = single_structure_blocks[block_no+1][0] - 1
-
                 if unusual_position in range(block[0]+1, block[1]):
                     unusual_and_blocks_status.append(
                         [block_no, ('right', gap_in, left, right)])
                     break
-                    
                 elif unusual_position == block[0]:
                     unusual_and_blocks_status.append(
                         [block_no, ('left', gap_in, left, right)])
                     break
         # calculate consensus
         consensus_dict = defaultdict(int)
+        # in rare case there is no consensus
+        if unusual_and_blocks_status == []:
+            continue
         for u_b_stat in unusual_and_blocks_status:
             consensus_dict[u_b_stat[1]] += 1
         max_value = 0
@@ -205,8 +202,6 @@ def move_1_2nt_gaps(
             if solution:
                 return move_1_2nt_gaps(
                     solution, offset=offset, offset_time=offset_time)
-
-
         solution = fix_one_place(
             dotbracket_structures=dotbracket_structures,
             position=unusual_position,
@@ -223,6 +218,35 @@ def move_1_2nt_gaps(
             return move_1_2nt_gaps(dotbracket_structures, offset=offset)
     # if no further change is possible
     return dotbracket_structures
+
+
+def find_counter_start_end(dotbracket_structures, position,
+        unusual_positions_places, representations):
+    # find end position good
+    end_position = position
+    while True:
+        if end_position + 1 in unusual_positions_places:
+            end_position += 1
+        else:
+            break
+
+    counter_start = 1000000000
+    counter_end = 1000000000
+    for dotbracket, representation in \
+            zip(dotbracket_structures, representations):
+        if dotbracket[position] not in ('.', '-'):
+            counter_start = min(counter_start, representation[position])
+            my_position = end_position
+            while dotbracket[my_position] in ('.', '-'):
+                my_position -= 1
+            counter_end = min(counter_end, representation[my_position])
+        if dotbracket[end_position] not in ('.', '-'):
+            counter_end = min(counter_end, representation[end_position])
+            my_position = position
+            while dotbracket[my_position] in ('.', '-'):
+                my_position += 1
+            counter_start = min(counter_start, representation[my_position])
+    return counter_end, counter_start
 
 
 def fix_one_place_constant_dist(
@@ -249,19 +273,16 @@ def fix_one_place_constant_dist(
                 and len(structural_blocks) == len(block_ids):
             # if block of the same len and not starting in the same position
             # and overlapping position (just to simplify)
-            shift_table = [block_max_start - structural_blocks[i][block_ids[i]][0]
+            shift_table = [block_max_start -
+                           structural_blocks[i][block_ids[i]][0]
                            for i in range(len(structural_blocks))]
 
             # mock
-            groups = []
-            more_left_group = 0
             how_many_nt_max = how_many_nt
             how_many_nt_by_structure = shift_table
-
             new_structures = move_structures(
-                dotbracket_structures, start_position, end_position, groups,
-                more_left_group, 'left', how_many_nt_max,
-                how_many_nt_by_structure)
+                dotbracket_structures, start_position, end_position,
+                'left', how_many_nt_max, how_many_nt_by_structure)
             return new_structures
 
     #calculate position
@@ -273,7 +294,8 @@ def fix_one_place_constant_dist(
         else:
             break
 
-    # calculate score for the positon and counter_position to determine what to move
+    # calculate score for the positon and counter_position to determine what
+    # to move
     # change position to counter position if necessary
     counter_start = 0
     counter_end = 10000000
@@ -325,33 +347,16 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
         else:
             break
 
-    # 01234567890123456
-    # ((((((..)))-)))-
-    # ((((((..)))--)))
-    # ((((((..))))))..
-    # 11-13
-    counter_start = 1000000000
-    counter_end = 1000000000
-    for dotbracket, representation in \
-            zip(dotbracket_structures, representations):
-        if dotbracket[position] not in ('.', '-') \
-                and dotbracket[end_position] not in ('.', '-'):
-            counter_start = min(counter_start, representation[position])
-            counter_end = min(counter_end, representation[end_position])
+    counter_end, counter_start = find_counter_start_end(
+        dotbracket_structures, position, unusual_positions_places,
+        representations)
+
     dotbracket_structures_orig = _get_slice_of_dotbracket(
         dotbracket_structures, position, end_position+1)
     dotbracket_structures_counter = _get_slice_of_dotbracket(
         dotbracket_structures, counter_end, counter_start+1)
     score_1 = score_by_conservation(dotbracket_structures_orig)
     score_2 = score_by_conservation(dotbracket_structures_counter)
-
-
-    ################################################
-    # additional check for 1-2 nt shift in same length blocks
-    structural_blocks = [
-        find_structural_blocks(dotbracket_structure, representation)
-        for dotbracket_structure, representation in
-        zip(dotbracket_structures, representations)] ################################################## remove it - get from outer function
 
     # check if change should be in the counter place
     if score_1 > score_2:
@@ -374,27 +379,19 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
             found = False
             for i in range(1, how_many_nt + 1):
                 if position + i in representation:
-                    detailed_groups[representation[position + i] + i].append(structure_no)
+                    detailed_groups[representation[position + i] + i].append(
+                        structure_no)
                     found = True
                     break
                 if position - i in representation:
-                    detailed_groups[representation[position - i] - i].append(structure_no)
+                    detailed_groups[representation[position - i] - i].append(
+                        structure_no)
                     found = True
                     break
             if not found:
                 detailed_groups['position'].append(structure_no)
 
     #check group, that is more to the left
-    names = list(groups.keys())
-    more_left_group = None
-    # to determine more left group - delete position first from names
-    # because position should appear almost always
-    if 'position' in names:
-        names.remove('position')
-    if score_1 > score_2:
-        more_left_group = min(names)
-    else:
-        more_left_group = max(names)
     groups = detailed_groups
     names = list(groups.keys())
     if 'position' in names:
@@ -407,7 +404,8 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
         groups[sorted_group_keys[0]].extend(groups['position'])
         del groups['position']
 
-    # if distance is acceptable - then do it - in case of lack of secondary structure element - distance may be huge
+    # if distance is acceptable - then do it - in case of lack of
+    # secondary structure element - distance may be huge
     distances = [
         abs(sorted_group_keys[0] - x)
         if abs(sorted_group_keys[0] - x) <= how_many_nt
@@ -421,14 +419,13 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
 
     how_many_nt_max = abs(sorted_group_keys[0] - sorted_group_keys[-1])
     new_structures = move_structures(
-        dotbracket_structures, start_position, end_position, groups,
-        more_left_group, left_or_right, how_many_nt_max, how_many_nt_by_structure)
+        dotbracket_structures, start_position, end_position, left_or_right,
+        how_many_nt_max, how_many_nt_by_structure)
     return new_structures
 
 
-# TODO remove groups, more_left_group,
 def move_structures(dotbracket_structures, start_position, end_position,
-                    groups, more_left_group, left_or_right, how_many_nt, how_many_nt_by_structure):
+                    left_or_right, how_many_nt, how_many_nt_by_structure):
     able_to_move = True
 
     def _find_right_gap_indexes(
@@ -464,7 +461,8 @@ def move_structures(dotbracket_structures, start_position, end_position,
         if able_to_move:
             new_structures = []
             for structure_index, structure in enumerate(dotbracket_structures):
-                how_many_nt_structure = how_many_nt_by_structure[structure_index]
+                how_many_nt_structure = how_many_nt_by_structure[
+                    structure_index]
                 new_structure = structure[:start_position] \
                                 + '-' * how_many_nt_structure
 
@@ -482,7 +480,8 @@ def move_structures(dotbracket_structures, start_position, end_position,
             start_position+how_many_nt-1, 0, -1, how_many_nt_by_structure)
         if able_to_move:
             for structure_index, structure in enumerate(dotbracket_structures):
-                how_many_nt_structure = how_many_nt_by_structure[structure_index]
+                how_many_nt_structure = how_many_nt_by_structure[
+                    structure_index]
                 new_structure = ''
                 index_start = 0
                 for index in sorted(right_gap_indexes[structure_index]):
@@ -502,16 +501,18 @@ def move_structures(dotbracket_structures, start_position, end_position,
         how_many_nt_structure = how_many_nt_by_structure[structure_index]
         residual_nt = how_many_nt - how_many_nt_structure
 
-        if left_or_right == 'left':#structure_index in groups[more_left_group]:
+        if left_or_right == 'left':
             new_structure = structure[:start_position] \
                             + '-' * how_many_nt_structure \
-                            + structure[start_position:end_position+1+how_many_nt] \
+                            + structure[start_position:end_position+1
+                                                       +how_many_nt] \
                             + '-' * residual_nt \
                             + structure[end_position+1+how_many_nt:]
         else:
             new_structure = structure[:start_position] \
                             + '-' * residual_nt \
-                            + structure[start_position:end_position+1+how_many_nt] \
+                            + structure[start_position:end_position+1+
+                                                       how_many_nt] \
                             + '-' * how_many_nt_structure \
                             + structure[end_position+1+how_many_nt:]
         new_structures.append(new_structure)
@@ -567,6 +568,7 @@ def refine(dotbracket_structures, max_nt, center, repeat):
     for i in range(repeat):
         dotbracket_structures = move_1_2nt_gaps(
             dotbracket_structures, offset=0, max_diff=max_nt, multi_score=1.1)
+        dotbracket_structures = remove_gaps_same_place(dotbracket_structures)
         if center:
             representations = [
                 structure_to_representation(structure)

@@ -111,3 +111,6 @@ ViennaRNA-2.4.14.tar.gz
 .idea*
 
 
+# my directories
+errors/*
+to_check/*
