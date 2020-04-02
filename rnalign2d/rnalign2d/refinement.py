@@ -209,6 +209,8 @@ def move_1_2nt_gaps(
             unusual_positions_places=unusual_positions_places,
             representations=representations,
             how_many_nt=how_many_nt)
+        if not solution:
+            return move_1_2nt_gaps(dotbracket_structures, offset=offset)
         score_post = score_by_conservation(solution)
 
         offset = consensus[3]
@@ -278,8 +280,8 @@ def fix_one_place_constant_dist(
                            for i in range(len(structural_blocks))]
 
             # mock
-            how_many_nt_max = how_many_nt
             how_many_nt_by_structure = shift_table
+            how_many_nt_max = max(shift_table)
             new_structures = move_structures(
                 dotbracket_structures, start_position, end_position,
                 'left', how_many_nt_max, how_many_nt_by_structure)
@@ -416,6 +418,7 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
             if i in groups[key]:
                 how_many_nt_by_structure.append(distances[key_no])
                 break
+
 
     how_many_nt_max = abs(sorted_group_keys[0] - sorted_group_keys[-1])
     new_structures = move_structures(
