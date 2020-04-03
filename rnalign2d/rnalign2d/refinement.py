@@ -419,7 +419,6 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
                 how_many_nt_by_structure.append(distances[key_no])
                 break
 
-
     how_many_nt_max = abs(sorted_group_keys[0] - sorted_group_keys[-1])
     new_structures = move_structures(
         dotbracket_structures, start_position, end_position, left_or_right,
@@ -432,11 +431,12 @@ def move_structures(dotbracket_structures, start_position, end_position,
     able_to_move = True
 
     def _find_right_gap_indexes(
-            dotbracket_structures, start_seek_position, end_seek_position,
+            dotbracket_structures, start_seek_positions, end_seek_position,
             seek_step, how_many_nt_by_structure):
         able_to_move = True
         right_gap_indexes = defaultdict(list)
         for structure_id in range(len(dotbracket_structures)):
+            my_start_seek_position = start_seek_positions[structure_id]
             if not able_to_move:
                 break
             how_may_to_find = how_many_nt_by_structure[structure_id]
@@ -444,7 +444,7 @@ def move_structures(dotbracket_structures, start_position, end_position,
                 continue
             structure = dotbracket_structures[structure_id]
             for position in range(
-                    start_seek_position, end_seek_position, seek_step):
+                    my_start_seek_position, end_seek_position, seek_step):
                 letter = structure[position]
                 if letter == '-':
                     right_gap_indexes[structure_id].append(position)
@@ -459,7 +459,8 @@ def move_structures(dotbracket_structures, start_position, end_position,
     new_structures = []
     if left_or_right == 'left':
         right_gap_indexes, able_to_move = _find_right_gap_indexes(
-            dotbracket_structures, end_position+1,
+            dotbracket_structures,
+            [end_position+1 for i in how_many_nt_by_structure],
             len(dotbracket_structures[0]), 1, how_many_nt_by_structure)
         if able_to_move:
             new_structures = []
@@ -480,7 +481,8 @@ def move_structures(dotbracket_structures, start_position, end_position,
     else:
         right_gap_indexes, able_to_move = _find_right_gap_indexes(
             dotbracket_structures,
-            start_position+how_many_nt-1, 0, -1, how_many_nt_by_structure)
+            [start_position+i-1 for i in how_many_nt_by_structure],
+            0, -1, how_many_nt_by_structure)
         if able_to_move:
             for structure_index, structure in enumerate(dotbracket_structures):
                 how_many_nt_structure = how_many_nt_by_structure[
