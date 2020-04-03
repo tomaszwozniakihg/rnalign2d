@@ -187,7 +187,6 @@ def move_1_2nt_gaps(
                 max_value = consensus_dict[key]
                 consensus = key
         left_or_right = consensus[0]
-
         score_pre = score_by_conservation(dotbracket_structures)
 
         offset_time += 1
@@ -254,7 +253,17 @@ def find_counter_start_end(dotbracket_structures, position,
 def fix_one_place_constant_dist(
         dotbracket_structures, structural_blocks, position,
         unusual_positions_places, representations, how_many_nt):
-    def _fix_constant_len_blocks(x_position):
+
+    def _get_slice_of_dotbracket(dotbracket_structures, start, end):
+        """
+        :param dotbracket_structures: list of dot-bracket secondary structures
+        :param start: starting point - where to cut
+        :param end: ending point - where to cut
+        :return: list of slices from dot-bracket secondary structures
+        """
+        return [x[start:end] for x in dotbracket_structures]
+
+    def _fix_constant_len_blocks(x_position, x2_position):
         block_len = 0
         block_start = 100000000
         block_max_start = 0
@@ -267,23 +276,23 @@ def fix_one_place_constant_dist(
                     block_start = min(block[0], block_start)
                     block_max_start = max(block[0], block_max_start)
                     if block_len == 0:
-                        block_len = block[1] - block[0]
+                        block_len = block[1] - max(block[0], x_position)
                     else:
-                        if block_len != block[1] - block[0]:
+                        if block_len != block[1] - max(block[0], x_position):
                             same_len = False
         if same_len and block_start != block_max_start \
                 and len(structural_blocks) == len(block_ids):
             # if block of the same len and not starting in the same position
             # and overlapping position (just to simplify)
             shift_table = [block_max_start -
-                           structural_blocks[i][block_ids[i]][0]
+                           max(structural_blocks[i][block_ids[i]][0], x_position)
                            for i in range(len(structural_blocks))]
 
             # mock
             how_many_nt_by_structure = shift_table
             how_many_nt_max = max(shift_table)
             new_structures = move_structures(
-                dotbracket_structures, start_position, end_position,
+                dotbracket_structures, x_position, x2_position,
                 'left', how_many_nt_max, how_many_nt_by_structure)
             return new_structures
 
@@ -296,25 +305,30 @@ def fix_one_place_constant_dist(
         else:
             break
 
-    # calculate score for the positon and counter_position to determine what
-    # to move
-    # change position to counter position if necessary
-    counter_start = 0
-    counter_end = 10000000
-    for dotbracket, representation in \
-            zip(dotbracket_structures, representations):
-        if dotbracket[position] not in ('.', '-') \
-                and dotbracket[end_position] not in ('.', '-'):
-            counter_start = max(representation[position], counter_start)
-            counter_end = min(representation[end_position], counter_end)
-
+    counter_end, counter_start = find_counter_start_end(
+        dotbracket_structures, position,
+        unusual_positions_places, representations)
+    dotbracket_structures_orig = _get_slice_of_dotbracket(
+        dotbracket_structures, start_position, end_position+1)
+    dotbracket_structures_counter = _get_slice_of_dotbracket(
+        dotbracket_structures, counter_end, counter_start+1)
+    score_1 = score_by_conservation(dotbracket_structures_orig)
+    score_2 = score_by_conservation(dotbracket_structures_counter)
     x_position = start_position
-    result = _fix_constant_len_blocks(x_position)
+    x2_position = end_position
+    if score_1 > score_2:
+        x_position = counter_end
+        x2_position = counter_start
+    result = _fix_constant_len_blocks(x_position, x2_position)
     if result:
         return result
 
     x_position = counter_end
-    result = _fix_constant_len_blocks(x_position)
+    x2_position = counter_start
+    if score_1 > score_2:
+        x_position = start_position
+        x2_position = end_position
+    result = _fix_constant_len_blocks(x_position, x2_position)
     if result:
         return result
     return None
@@ -569,10 +583,29 @@ def move_gaps_to_the_loop_centre(dotbracket_structures, structural_blocks):
     return new_structures
 
 
+def fix_end3prim(new_structures):
+    # fix if change at the 3' end and len is different
+    lens = [len(x) for x in new_structures]
+    if min(lens) != max(lens):
+        max_len = max(lens)
+        new_structures_2 = []
+        for structure in new_structures:
+            if len(structure) < max_len:
+                elements = [x for x in structure]
+                while len(elements) < max_len:
+                    elements.append('-')
+                new_structures_2.append(''.join(elements))
+            else:
+                new_structures_2.append(structure)
+        new_structures = new_structures_2
+    return new_structures
+
+
 def refine(dotbracket_structures, max_nt, center, repeat):
     for i in range(repeat):
         dotbracket_structures = move_1_2nt_gaps(
             dotbracket_structures, offset=0, max_diff=max_nt, multi_score=1.1)
+        dotbracket_structures = fix_end3prim(dotbracket_structures)
         dotbracket_structures = remove_gaps_same_place(dotbracket_structures)
         if center:
             representations = [
