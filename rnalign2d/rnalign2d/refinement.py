@@ -280,6 +280,8 @@ def fix_one_place_constant_dist(
                     else:
                         if block_len != block[1] - max(block[0], x_position):
                             same_len = False
+        if block_max_start < x_position:
+            return dotbracket_structures
         if same_len and block_start != block_max_start \
                 and len(structural_blocks) == len(block_ids):
             # if block of the same len and not starting in the same position
@@ -294,6 +296,7 @@ def fix_one_place_constant_dist(
             new_structures = move_structures(
                 dotbracket_structures, x_position, x2_position,
                 'left', how_many_nt_max, how_many_nt_by_structure)
+            new_structures = fix_end3prim(new_structures)
             return new_structures
 
     #calculate position
@@ -437,6 +440,7 @@ def fix_one_place(dotbracket_structures, position, left_or_right,
     new_structures = move_structures(
         dotbracket_structures, start_position, end_position, left_or_right,
         how_many_nt_max, how_many_nt_by_structure)
+    new_structures = fix_end3prim(new_structures)
     return new_structures
 
 
