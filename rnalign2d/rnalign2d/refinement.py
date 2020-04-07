@@ -136,7 +136,7 @@ def calculate_unusual_positions_places(
 
 def move_1_2nt_gaps(
         dotbracket_structures, offset=0, max_diff=5, multi_score=1.01,
-        offset_time=0):
+        offset_time=0, option=0):
     representations = [
         structure_to_representation(structure)
         for structure in dotbracket_structures]
@@ -191,16 +191,18 @@ def move_1_2nt_gaps(
 
         offset_time += 1
         if offset_time <= 2:
-            solution = fix_one_place_constant_dist(
+            solution, option = fix_one_place_constant_dist(
                 dotbracket_structures=dotbracket_structures,
                 structural_blocks=structural_blocks,
                 position=unusual_position,
                 unusual_positions_places=unusual_positions_places,
                 representations=representations,
-                how_many_nt=how_many_nt)
+                how_many_nt=how_many_nt,
+                option=option)
             if solution:
                 return move_1_2nt_gaps(
-                    solution, offset=offset, offset_time=offset_time)
+                    solution, offset=offset, offset_time=offset_time,
+                    option=option)
         solution = fix_one_place(
             dotbracket_structures=dotbracket_structures,
             position=unusual_position,
@@ -252,7 +254,7 @@ def find_counter_start_end(dotbracket_structures, position,
 
 def fix_one_place_constant_dist(
         dotbracket_structures, structural_blocks, position,
-        unusual_positions_places, representations, how_many_nt):
+        unusual_positions_places, representations, how_many_nt, option=0):
 
     def _get_slice_of_dotbracket(dotbracket_structures, start, end):
         """
@@ -317,24 +319,44 @@ def fix_one_place_constant_dist(
         dotbracket_structures, counter_end, counter_start+1)
     score_1 = score_by_conservation(dotbracket_structures_orig)
     score_2 = score_by_conservation(dotbracket_structures_counter)
-    x_position = start_position
-    x2_position = end_position
-    if score_1 > score_2:
-        x_position = counter_end
-        x2_position = counter_start
-    result = _fix_constant_len_blocks(x_position, x2_position)
-    if result:
-        return result
-
-    x_position = counter_end
-    x2_position = counter_start
-    if score_1 > score_2:
+    if not option:
+        option = 1
         x_position = start_position
         x2_position = end_position
-    result = _fix_constant_len_blocks(x_position, x2_position)
-    if result:
-        return result
-    return None
+        if score_1 > score_2:
+            x_position = counter_end
+            x2_position = counter_start
+            option = 2
+        result = _fix_constant_len_blocks(x_position, x2_position)
+        if result:
+            return result, option
+
+        x_position = counter_end
+        x2_position = counter_start
+        option = 2
+        if score_1 > score_2:
+            x_position = start_position
+            x2_position = end_position
+            option = 1
+        result = _fix_constant_len_blocks(x_position, x2_position)
+        if result:
+            return result
+        return None, option
+    else:
+        if option == 1:
+            x_position = counter_end
+            x2_position = counter_start
+            option = 2
+        else:
+            x_position = start_position
+            x2_position = end_position
+            option = 1
+        result = _fix_constant_len_blocks(x_position, x2_position)
+        if result:
+            return result, option
+
+
+
 
 
 def fix_one_place(dotbracket_structures, position, left_or_right,
@@ -605,12 +627,60 @@ def fix_end3prim(new_structures):
     return new_structures
 
 
+def fix_to_much_gaps(dotbracket_structures):
+    gap_started = False
+    start_all_single_or_gap = 0
+    places_to_check = []
+    places_to_fix = []
+    for position in range(len(dotbracket_structures[0])):
+        all_gaps = True
+        for structure in dotbracket_structures:
+            if structure[position] not in ('.', '-'):
+                all_gaps = False
+
+        if gap_started:
+            if not all_gaps:
+                end_all_single_or_gap = position
+                places_to_check.append(
+                    (start_all_single_or_gap, end_all_single_or_gap))
+                gap_started = False
+        else:
+            if all_gaps:
+                start_all_single_or_gap = position
+                gap_started = True
+    for place in places_to_check:
+        gap_counter = [x[place[0]:place[1]].count('-') for x
+                       in dotbracket_structures]
+        max_gaps = min(gap_counter)
+        if max_gaps != 0:
+            places_to_fix.append((place[0], place[1], max_gaps))
+    places_to_fix.reverse()
+    for place in places_to_fix:
+        new_dotbracket_structures = []
+        for structure in dotbracket_structures:
+            count = place[2]
+            new_structure = [structure[:place[0]], ]
+            for i in range(place[0], place[1]):
+                if count == 0:
+                    new_structure.append(structure[i])
+                else:
+                    if structure[i] == '-':
+                        count -= 1
+                    else:
+                        new_structure.append(structure[i])
+            new_structure.append(structure[place[1]:])
+            new_dotbracket_structures.append(''.join(new_structure))
+        dotbracket_structures = new_dotbracket_structures
+    return dotbracket_structures
+
+
 def refine(dotbracket_structures, max_nt, center, repeat):
     for i in range(repeat):
         dotbracket_structures = move_1_2nt_gaps(
             dotbracket_structures, offset=0, max_diff=max_nt, multi_score=1.1)
         dotbracket_structures = fix_end3prim(dotbracket_structures)
         dotbracket_structures = remove_gaps_same_place(dotbracket_structures)
+        dotbracket_structures = fix_to_much_gaps(dotbracket_structures)
         if center:
             representations = [
                 structure_to_representation(structure)
