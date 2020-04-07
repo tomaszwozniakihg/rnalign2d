@@ -340,8 +340,8 @@ def fix_one_place_constant_dist(
             option = 1
         result = _fix_constant_len_blocks(x_position, x2_position)
         if result:
-            return result
-        return None, option
+            return result, option
+        return (None, option)
     else:
         if option == 1:
             x_position = counter_end
@@ -354,9 +354,7 @@ def fix_one_place_constant_dist(
         result = _fix_constant_len_blocks(x_position, x2_position)
         if result:
             return result, option
-
-
-
+        return (None, option)
 
 
 def fix_one_place(dotbracket_structures, position, left_or_right,
