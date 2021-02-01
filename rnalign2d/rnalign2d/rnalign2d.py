@@ -4,11 +4,9 @@ from uuid import uuid4
 try:
     from .conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION
     from .common import parse_file, convert_to_file_data
-    from .refinement import refine
 except SystemError:
     from rnalign2d.conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION
     from rnalign2d.common import parse_file, convert_to_file_data
-    from rnalign2d.refinement import refine
 
 
 MODIFICATIONS = {
@@ -157,15 +155,9 @@ def calculate_alignment(
 
 
 def calculate_alignment_from_file(
-        filename, out_filename, mode, matrix, gapopen, gapextend, refinement,
-        max_refinement, center, repeat_refinement):
+        filename, out_filename, mode, matrix, gapopen, gapextend):
     sequences = parse_file(filename)
     result = calculate_alignment(sequences, mode, matrix, gapopen, gapextend)
-    if refinement:
-        dotbracket_structures = [x[2] for x in result]
-        dotbracket_structures = refine(
-            dotbracket_structures, max_refinement, center, repeat_refinement)
-        result=convert_to_file_data(result, dotbracket_structures)
     with open(out_filename, 'w') as f:
         for element in result:
             f.write("{}\n{}\n{}\n".format(*element))
@@ -187,21 +179,10 @@ def main():
     parser.add_argument("-gapopen", type=int, default=-12)
     parser.add_argument("-gapextend", type=int, default=-1)
 
-    parser.add_argument("-refinement", action='store_true')
-    parser.add_argument(
-        "-max_refinement", help="Maximum refinement range (nt)", type=int,
-        default=5)
-    parser.add_argument(
-        '-no_center', help="Center gaps within loops?", action='store_true')
-    parser.add_argument(
-        '-repeat_refinement', help="How many times to repeat", type=int,
-        default=1)
     args = parser.parse_args()
     calculate_alignment_from_file(
         args.i, args.o, mode=args.mode, matrix=args.matrix,
-        gapopen=args.gapopen, gapextend=args.gapextend,
-        refinement=args.refinement, max_refinement=args.max_refinement,
-        center=not args.no_center, repeat_refinement=args.repeat_refinement)
+        gapopen=args.gapopen, gapextend=args.gapextend)
 
 
 if __name__ == '__main__':

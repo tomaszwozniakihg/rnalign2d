@@ -18,7 +18,7 @@ def score_brackets(
     score = 0
     if dot_bracket1 == dot_bracket2 and dot_bracket1 == '.':
         score = score_two_dots
-    if dot_bracket1 == dot_bracket2:
+    elif dot_bracket1 == dot_bracket2:
         score = score_same_brackets
     elif (dot_bracket1 in OPENING_BRACKETS and
                   dot_bracket2 in OPENING_BRACKETS) or (
