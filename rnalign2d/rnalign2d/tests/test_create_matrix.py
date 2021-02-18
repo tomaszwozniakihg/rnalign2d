@@ -9,8 +9,8 @@ from rnalign2d.create_matrix import create_matrix
     ("simple", "simple_matrix"),
     ("pseudo", "pseudo_matrix")])
 def test_create_matrix(mode, filename):
-    result = create_matrix(7, 2, -10, -1, 3, 1, mode=mode)
+    result = create_matrix(5, 2, -10, -8, 5, 5, mode=mode)
     file = os.path.normpath(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), '..', 'data',filename))
+        os.path.dirname(os.path.abspath(__file__)), 'data', filename))
     reference = open(file, 'r').read()
     assert result == reference

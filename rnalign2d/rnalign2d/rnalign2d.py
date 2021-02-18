@@ -4,9 +4,13 @@ from uuid import uuid4
 try:
     from .conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION
     from .common import parse_file, convert_to_file_data
+    from .fix_pseudoknots import \
+        representation_to_structure, structure_to_representation
 except SystemError:
     from rnalign2d.conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION
     from rnalign2d.common import parse_file, convert_to_file_data
+    from rnalign2d.fix_pseudoknots import \
+        representation_to_structure, structure_to_representation
 
 
 MODIFICATIONS = {
@@ -155,8 +159,23 @@ def calculate_alignment(
 
 
 def calculate_alignment_from_file(
-        filename, out_filename, mode, matrix, gapopen, gapextend):
+        filename, out_filename, mode, matrix, gapopen, gapextend,
+        fix_pseudoknots=False):
     sequences = parse_file(filename)
+    if fix_pseudoknots:
+        print('fixing pseudoknots')
+        new_sequences = []
+        for name, sequence, structure in sequences:
+            if '[' in structure:
+                new_structure = representation_to_structure(
+                    structure, structure_to_representation(structure))
+                if new_structure != structure:
+                    print('Structure before:\n{}\nStructure after :\n{}'.format(
+                        structure, new_structure))
+                new_sequences.append((name, sequence, new_structure))
+            else:
+                new_sequences.append((name, sequence, structure))
+
     result = calculate_alignment(sequences, mode, matrix, gapopen, gapextend)
     with open(out_filename, 'w') as f:
         for element in result:
@@ -178,11 +197,13 @@ def main():
         choices=['simple', 'pseudo'], default='simple')
     parser.add_argument("-gapopen", type=int, default=-12)
     parser.add_argument("-gapextend", type=int, default=-1)
+    parser.add_argument("-fix_pseudoknots", action='store_true')
 
     args = parser.parse_args()
     calculate_alignment_from_file(
         args.i, args.o, mode=args.mode, matrix=args.matrix,
-        gapopen=args.gapopen, gapextend=args.gapextend)
+        gapopen=args.gapopen, gapextend=args.gapextend,
+        fix_pseudoknots=args.fix_pseudoknots)
 
 
 if __name__ == '__main__':

@@ -54,9 +54,9 @@ def test_add_original_modifications(sequence, original_sequence, result):
        ')....')],
      'simple',
      [('>tdbR00000365',
-       'AAAUAUGA"GCGA--UUUAUUGCAAPUAGPUUCGACCUAAUCUUAGGUG--AAAUUCACCCAPAUU'
+       'AAAUAUGA"GCGA--UUUAUUGCAAPUAGPUUCGACCUAAUCUUAGGU-GAAAUUC-ACCCAPAUU'
        'UUCCA',
-       '(((((((..((((--....)))).(((((.......)))))....((((--.....))))))))))'
+       '(((((((..((((--....)))).(((((.......)))))....(((-(.....)-)))))))))'
        ')....'),
       ('>tdbR00000030',
        'AAAAAAUU"GUUUAAUCAAAAACCPPAGUAUGUC6AACUAAAAAAAUUAGAUCAUCUAAUAPPUUU'
