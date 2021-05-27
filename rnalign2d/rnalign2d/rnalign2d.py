@@ -6,7 +6,7 @@ try:
     from .common import parse_file, convert_to_file_data
     from .fix_pseudoknots import \
         representation_to_structure, structure_to_representation
-except SystemError:
+except (SystemError, ImportError):
     from rnalign2d.conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION
     from rnalign2d.common import parse_file, convert_to_file_data
     from rnalign2d.fix_pseudoknots import \

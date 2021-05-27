@@ -3,7 +3,7 @@ import argparse
 from collections import defaultdict
 try:
     from .conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION, LETTERS
-except SystemError:
+except (SystemError, ImportError):
     from rnalign2d.conversion import SIMPLE_CONVERSION, PSEUDOKNOT_CONVERSION, \
         LETTERS
 
