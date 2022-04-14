@@ -175,6 +175,7 @@ def calculate_alignment_from_file(
                 new_sequences.append((name, sequence, new_structure))
             else:
                 new_sequences.append((name, sequence, structure))
+        sequences = new_sequences
 
     result = calculate_alignment(sequences, mode, matrix, gapopen, gapextend)
     with open(out_filename, 'w') as f:

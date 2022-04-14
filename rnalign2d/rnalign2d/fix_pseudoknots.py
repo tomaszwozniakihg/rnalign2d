@@ -3,7 +3,7 @@ import string
 
 try:
     from .common import parse_file
-except SystemError:
+except (SystemError, ValueError):
     from common import parse_file
 
 OPENING = ['(', '[', '{', '<' ]
@@ -41,10 +41,14 @@ def representation_to_structure(dotbracket_structure, matching_positions):
         if dotbracket == '.':
             new_structure.append('.')
         elif dotbracket in OPENING: # ([{ etc
-            if level_closures: #remove dangling None at the end
-                while level_closures[-1] == None:
-                    level_closures.pop()
+            #remove dangling None at the end
+            while level_closures and level_closures[-1] == None:
+                level_closures.pop()
+            # fixture for multiple pseudoknots if it is not reseted properly
+            while level > max(0, len(level_closures) -1):
+               level -= 1
             if level_closures: # if there are entries in the level_closures
+                #level = len(level_closures) -1
                 if not None in level_closures \
                         and level_closures[level] > matching_positions[index]:
                     # if this is the same level of brackets - just change
@@ -99,7 +103,7 @@ def process_file(filename_in, filename_out):
         else:
             result.append(structure)
     with open(filename_out, 'w') as f_out:
-        f_out.write(''.join(result))
+        f_out.write('\n'.join(result))
 
 
 def main():
