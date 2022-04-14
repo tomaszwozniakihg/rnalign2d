@@ -156,4 +156,4 @@ To test this software Vienna RNA is required, otherwise one test would fail.
 CITATION
 ========
 If you are using our software in your research - cite us:
-<manuscript in preparation>
+Tomasz Woźniak, Małgorzata Sajek, Jadwiga Jaruzelska, Marcin Piotr Sajek; RNAlign2D: a rapid method for combined RNA structure and sequence-based alignment using a pseudo-amino acid substitution matrix; BMC Bioinformatics. 2021 Oct 16;22(1):504. doi: 10.1186/s12859-021-04426-8.
